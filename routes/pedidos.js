@@ -53,18 +53,27 @@ router.patch('/:id', async (req, res) => {
 });
 
 // Rota para deletar um pedido
-router.delete('/:id', async (req, res) => {
+const mongoose = require('mongoose');
+
+router.delete('/:id', async (req, res) => {   
     try {
         const pedido = await Pedido.findById(req.params.id);
-        if (pedido == null) {
+        if (pedido == null) {           
             return res.status(404).json({ message: 'Pedido não encontrado' });
         }
-
-        await pedido.remove();
+        
+        await Pedido.deleteOne({ _id: req.params.id });
         res.json({ message: 'Pedido deletado' });
     } catch (err) {
+        console.error('Erro ao deletar pedido:', err.message);
         res.status(500).json({ message: err.message });
     }
 });
+
+
+
+
+
+
 
 module.exports = router;

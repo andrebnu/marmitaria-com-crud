@@ -12,5 +12,8 @@
   "dependencies": {
     "express": "^4.21.0",
     "mongoose": "^8.7.0"
+  },
+  "devDependencies": {
+    "@types/mongodb": "^4.0.7"
   }
 }
