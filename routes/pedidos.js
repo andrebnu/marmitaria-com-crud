@@ -19,9 +19,9 @@ const { body, validationResult } = require('express-validator');
 
 // Rota para criar um novo pedido
 router.post('/', [
-    body('cliente').isString().withMessage('O campo cliente deve ser uma string.'),
-    body('marmita').isIn(['Pequena', 'Média', 'Grande']).withMessage('O campo marmita deve ser uma das seguintes opções: Pequena, Média, Grande.'),
-    body('quantidade').isInt({ min: 1 }).withMessage('A quantidade deve ser um número inteiro maior que 0.')
+    body('cliente').optional().isString().notEmpty().withMessage('O cliente deve ser um texto não vazio.'),
+    body('marmita').optional().isString().notEmpty().withMessage('A marmita deve ser um texto não vazio.'),
+    body('quantidade').optional().isInt({ min: 1 }).withMessage('A quantidade deve ser um número inteiro maior que 0.')
 ], async (req, res) => {
     // Verifica se há erros de validação
     const errors = validationResult(req);
