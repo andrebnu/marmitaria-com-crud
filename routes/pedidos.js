@@ -1,4 +1,5 @@
 const express = require('express');
+const { body, validationResult } = require('express-validator');
 const Pedido = require('../models/Pedido');  // Importa o modelo Pedido
 const router = express.Router();
 
@@ -13,12 +14,27 @@ router.get('/', async (req, res) => {
 });
 
 // Rota para criar um novo pedido
-router.post('/', async (req, res) => {
+
+const { body, validationResult } = require('express-validator');
+
+// Rota para criar um novo pedido
+router.post('/', [
+    body('cliente').isString().withMessage('O campo cliente deve ser uma string.'),
+    body('marmita').isIn(['Pequena', 'Média', 'Grande']).withMessage('O campo marmita deve ser uma das seguintes opções: Pequena, Média, Grande.'),
+    body('quantidade').isInt({ min: 1 }).withMessage('A quantidade deve ser um número inteiro maior que 0.')
+], async (req, res) => {
+    // Verifica se há erros de validação
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const pedido = new Pedido({
         cliente: req.body.cliente,
         marmita: req.body.marmita,
         quantidade: req.body.quantidade
     });
+
     try {
         const novoPedido = await pedido.save();
         res.status(201).json(novoPedido);
@@ -27,30 +43,45 @@ router.post('/', async (req, res) => {
     }
 });
 
+
+
 // Rota para atualizar um pedido
-router.patch('/:id', async (req, res) => {
-    try {
-        const pedido = await Pedido.findById(req.params.id);
-        if (pedido == null) {
-            return res.status(404).json({ message: 'Pedido não encontrado' });
+router.patch(
+    '/:id',
+    [
+        body('cliente').optional().isString().notEmpty().withMessage('O cliente deve ser um texto não vazio.'),
+        body('marmita').optional().isString().notEmpty().withMessage('A marmita deve ser um texto não vazio.'),
+        body('quantidade').optional().isInt({ min: 1 }).withMessage('A quantidade deve ser um número inteiro maior que 0.')
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
         }
 
-        if (req.body.cliente != null) {
-            pedido.cliente = req.body.cliente;
-        }
-        if (req.body.marmita != null) {
-            pedido.marmita = req.body.marmita;
-        }
-        if (req.body.quantidade != null) {
-            pedido.quantidade = req.body.quantidade;
-        }
+        try {
+            const pedido = await Pedido.findById(req.params.id);
+            if (pedido == null) {
+                return res.status(404).json({ message: 'Pedido não encontrado' });
+            }
 
-        const pedidoAtualizado = await pedido.save();
-        res.json(pedidoAtualizado);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+            if (req.body.cliente != null) {
+                pedido.cliente = req.body.cliente;
+            }
+            if (req.body.marmita != null) {
+                pedido.marmita = req.body.marmita;
+            }
+            if (req.body.quantidade != null) {
+                pedido.quantidade = req.body.quantidade;
+            }
+
+            const pedidoAtualizado = await pedido.save();
+            res.json(pedidoAtualizado);
+        } catch (err) {
+            res.status(400).json({ message: err.message });
+        }
     }
-});
+);
 
 // Rota para deletar um pedido
 const mongoose = require('mongoose');

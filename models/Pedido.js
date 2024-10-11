@@ -12,7 +12,8 @@ const pedidoSchema = new mongoose.Schema({
     },
     quantidade: {
         type: Number,
-        required: true
+        required: true,
+        min: 1
     },
     data: {
         type: Date,

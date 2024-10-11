@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
  
 const app = express();
@@ -11,6 +12,7 @@ mongoose.connect('mongodb://localhost:27017/pedidosDB')
 
 // Middleware para permitir que o Express leia JSON
 app.use(express.json());
+
 
 // Importa as rotas de pedidos
 const pedidosRouter = require('./routes/pedidos');
