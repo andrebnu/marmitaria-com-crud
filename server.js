@@ -1,7 +1,7 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
- 
+const authRoutes = require('./routes/auth');
+
 const app = express();
 const port = 3000;
 
@@ -13,6 +13,8 @@ mongoose.connect('mongodb://localhost:27017/pedidosDB')
 // Middleware para permitir que o Express leia JSON
 app.use(express.json());
 
+// Importa as rotas de autenticação
+app.use('/auth', authRoutes); // Certifique-se de que o caminho está correto
 
 // Importa as rotas de pedidos
 const pedidosRouter = require('./routes/pedidos');
@@ -22,6 +24,12 @@ app.use('/pedidos', pedidosRouter);
 app.get('/', (req, res) => {
     res.send('Bem-vindo ao sistema de pedidos de marmitas!');
 });
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: err.message });
+});
+
 
 // Inicia o servidor
 app.listen(port, () => {

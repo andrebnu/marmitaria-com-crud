@@ -1,21 +1,18 @@
 const express = require('express');
+const protect  = require('../middleware/authMiddleware'); // Verifique se o caminho está correto
 const { body, validationResult } = require('express-validator');
 const Pedido = require('../models/Pedido');  // Importa o modelo Pedido
 const router = express.Router();
 
 // Rota para listar todos os pedidos
-router.get('/', async (req, res) => {
+router.get('/', protect, async (req, res) => {
     try {
         const pedidos = await Pedido.find();
-        res.json(pedidos);
+        res.json({ message: 'Acesso autorizado aos pedidos', pedidos });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
-
-// Rota para criar um novo pedido
-
-const { body, validationResult } = require('express-validator');
 
 // Rota para criar um novo pedido
 router.post('/', [
