@@ -19,7 +19,7 @@ router.post('/', [
     body('cliente').optional().isString().notEmpty().withMessage('O cliente deve ser um texto não vazio.'),
     body('marmita').optional().isString().notEmpty().withMessage('A marmita deve ser um texto não vazio.'),
     body('quantidade').optional().isInt({ min: 1 }).withMessage('A quantidade deve ser um número inteiro maior que 0.')
-], async (req, res) => {
+],protect, async (req, res) => {
     // Verifica se há erros de validação
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -49,8 +49,8 @@ router.patch(
         body('cliente').optional().isString().notEmpty().withMessage('O cliente deve ser um texto não vazio.'),
         body('marmita').optional().isString().notEmpty().withMessage('A marmita deve ser um texto não vazio.'),
         body('quantidade').optional().isInt({ min: 1 }).withMessage('A quantidade deve ser um número inteiro maior que 0.')
-    ],
-    async (req, res) => {
+    ]
+    ,protect ,async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
@@ -83,7 +83,7 @@ router.patch(
 // Rota para deletar um pedido
 const mongoose = require('mongoose');
 
-router.delete('/:id', async (req, res) => {   
+router.delete('/:id',protect, async (req, res) => {   
     try {
         const pedido = await Pedido.findById(req.params.id);
         if (pedido == null) {           
