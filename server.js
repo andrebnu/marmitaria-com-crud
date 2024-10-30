@@ -1,8 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
+const cors = require('cors');
 
+// Inicializa o Express e habilita CORS para permitir requisições de outros domínios
 const app = express();
+app.use(cors());
+
+// Definição do porto do servidor
 const port = 3000;
 
 // Conectar ao MongoDB (substitua 'pedidosDB' pelo nome do seu banco de dados)
