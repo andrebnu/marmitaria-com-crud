@@ -25,11 +25,6 @@ app.use('/auth', authRoutes); // Certifique-se de que o caminho está correto
 const pedidosRouter = require('./routes/pedidos');
 app.use('/pedidos', pedidosRouter);
 
-// Rota principal
-app.get('/', (req, res) => {
-    res.send('Bem-vindo ao sistema de pedidos de marmitas!');
-});
-
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: err.message });
