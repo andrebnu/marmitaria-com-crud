@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true }
 });
 
-// Antes de salvar, vamos hashear a senha
+// Antes de salvar,  hashea a senha
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
