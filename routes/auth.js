@@ -5,17 +5,17 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 
 // Registro de usuário
-router.post('/register', async (req, res) => {
-  console.log('Registro iniciado', req.body);
-  const { username, password } = req.body;
+router.post('/register', async (req, res) => {  
+  const { username, email, password } = req.body;
 
   try {
-    const userExists = await User.findOne({ username });
+    // Verifica se o usuário ou e-mail já existe
+    const userExists = await User.findOne({ $or: [{ username }, { email }] });
     if (userExists) {
-      return res.status(400).json({ message: 'Usuário já existe' });
+      return res.status(400).json({ message: 'Usuário ou e-mail já existe' });
     }
 
-    const user = new User({ username, password });
+    const user = new User({ username, email, password });
     await user.save();
 
     res.status(201).json({ message: 'Usuário registrado com sucesso' });
@@ -27,24 +27,32 @@ router.post('/register', async (req, res) => {
 
 // Login de usuário
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  
+  const { identifier, password } = req.body;
+
   try {
-    const user = await User.findOne({ username });
-    if (!user) {    
-      return res.status(400).json({ message: 'Usuário não encontrado ' });
-    }
+      // Verifique se o identifier é um email ou um username
+      const user = await User.findOne({
+          $or: [
+              { username: identifier },
+              { email: identifier }
+          ]
+      });
 
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Senha incorreta' });
-    }
+      if (!user) {    
+          return res.status(400).json({ message: 'Usuário não encontrado' });
+      }
 
-    const token = jwt.sign({ id: user._id }, 'secret', { expiresIn: '1h' });
-    res.json({ token });
+      const isMatch = await user.matchPassword(password);
+      if (!isMatch) {
+          return res.status(400).json({ message: 'Senha incorreta' });
+      }
+
+      const token = jwt.sign({ id: user._id }, 'secret', { expiresIn: '1h' });
+      res.json({ token });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+      res.status(500).json({ message: err.message });
   }
 });
+
 
 module.exports = router;
